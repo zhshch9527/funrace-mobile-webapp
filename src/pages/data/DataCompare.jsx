@@ -116,9 +116,14 @@ class DataCompare extends React.Component {
                 });
             }
 
+            let canvasWidth = data.length <= 10 ? document.body.clientWidth : data.length * 50 ;
+
             return (
                 <BaseRender componentDidMount={drawChart} componentDidUpdate={drawChart}  divProps={{style:{backgroundColor:'white'}}}>
-                    <canvas id={id} width={document.body.clientWidth} height="260"></canvas>
+                    <div style={{overflowX:'auto'}}>
+                        <canvas id={id} style={{width:canvasWidth,height:300}} ></canvas>
+                        <div style={{width:canvasWidth}}>&nbsp;</div>
+                    </div>
                     <div style={{textAlign:'center',fontWeight:'bold',padding:10}}>{title}</div>
                 </BaseRender>
             )

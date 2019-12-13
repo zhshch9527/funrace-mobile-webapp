@@ -128,9 +128,13 @@ class DataClassification extends React.Component {
                 });
             }
 
+            let canvasWidth = data.length <= 10 ? document.body.clientWidth : data.length * 50 ;
             return (
                 <BaseRender componentDidMount={drawChart} componentDidUpdate={drawChart} divProps={{style:{backgroundColor:'white'}}}>
-                    <canvas id={id} width={document.body.clientWidth} height="260"></canvas>
+                    <div style={{overflowX:'auto'}}>
+                        <canvas id={id} style={{width:canvasWidth,height:300}} ></canvas>
+                        <div style={{width:canvasWidth}}>&nbsp;</div>
+                    </div>
                     <div style={{textAlign:'center',fontWeight:'bold',padding:10}}>{title}</div>
                 </BaseRender>
             )
@@ -151,12 +155,11 @@ class DataClassification extends React.Component {
             let title = TypeObjHelper.getTitleByIndex(selectedSegmentIndex)
             let code = TypeObjHelper.getCodeByIndex(selectedSegmentIndex)
 
-            let gridData = [{value:title},{value:'数量'},{value:'金额'},] ;
-            let values = data.flatMap(d=>{
+            let headerGridData = [{value:title},{value:'数量'},{value:'金额'},] ;
+            let gridData = data.flatMap(d=>{
                 let {name,count,money} = d ;
                 return [{value:name},{value:count},{value:money}] ;
             })
-            gridData = [...gridData,...values] ;
 
 
             let countChartOptions = {
@@ -167,21 +170,33 @@ class DataClassification extends React.Component {
                 data:data.map(d=>({name:d.name,count:d.money})),
                 type:code,
             }
+
+            let gridDivScrollProps = {} ;
+            if(gridData.length > 18){
+                gridDivScrollProps = {
+                    height:300,
+                    overflow:'auto',
+                }
+            }
             return (
                 <div>
                     <div style={{marginTop:10}}>
-                        <Grid data={gridData} itemStyle={{height:50}}
+                        <Grid data={headerGridData} itemStyle={{height:50,lineHeight:4}}
                               columnNum={3}
                               renderItem={(dataItem, itemIndex) => {
-                                  if(itemIndex === 0 || itemIndex === 1 || itemIndex === 2){
-                                      return (
-                                          <div style={{fontWeight:'bold',padding:10}}>{dataItem.value}</div>
-                                      )
-                                  }else{
-                                      return (
-                                          <div style={{padding:10}}>{dataItem.value}</div>
-                                      )
-                                  }
+                                  return (
+                                      <div style={{fontWeight:'bold'}}>{dataItem.value}</div>
+                                  )
+                              }}
+                        />
+                    </div>
+                    <div style={{...gridDivScrollProps,marginTop:-1,}}>
+                        <Grid data={gridData} itemStyle={{height:50,lineHeight:4}}
+                              columnNum={3}
+                              renderItem={(dataItem, itemIndex) => {
+                                  return (
+                                      <div >{dataItem.value}</div>
+                                  )
                               }}
                         />
                     </div>

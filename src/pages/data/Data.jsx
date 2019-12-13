@@ -1,13 +1,9 @@
 import React from 'react';
 import {List,Button,Toast,DatePicker,Grid,SegmentedControl,WhiteSpace,Menu,ActivityIndicator,NavBar} from 'antd-mobile';
 import { createForm, formShape } from 'rc-form';
-import {isEmpty, isNotEmpty} from "../../utils/common";
-import F2 from '@antv/f2/lib/index-all';
-import BaseRender from "../../components/base/BaseRender";
 import DataRanking from './DataRanking' ;
 import DataClassification from './DataClassification' ;
 import DataCompare from './DataCompare' ;
-import {call} from "../../utils/service";
 const {Item} = List ;
 
 
