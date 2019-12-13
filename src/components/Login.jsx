@@ -1,6 +1,6 @@
 import React from 'react';
 import { hashHistory } from 'react-router';
-import { InputItem ,List,Button,Toast,Switch } from 'antd-mobile';
+import { InputItem ,List,Button,Toast,Switch ,WhiteSpace} from 'antd-mobile';
 import { createForm, formShape } from 'rc-form';
 import favicon from '../../public/favicon.png' ;
 import {call} from "../utils/service";
@@ -47,18 +47,22 @@ class Form extends React.Component {
         return (
             <form style={{margin:20,backgroundColor:'white'}}>
                <List renderHeader={()=>{
-                   return <img src={favicon}/>
+                   return (
+                       <div style={{textAlign:'center'}}>
+                           <img src={favicon} />
+                       </div>
+                   )
                }}>
-                   <InputItem
-                       {...getFieldProps('account',{
-                           rules: [
-                               { required: true, message: '账号不可为空' },
-                           ],
-                       })}
-                       placeholder="请输入账号"
-                       clear
-                   >账号</InputItem>
-                   <InputItem
+                 <InputItem className={"login"}
+                     {...getFieldProps('account',{
+                         rules: [
+                             { required: true, message: '账号不可为空' },
+                         ],
+                     })}
+                     placeholder="请输入账号"
+                     clear
+                 >账号</InputItem>
+                   <InputItem className={"login"}
                        {...getFieldProps('password',{
                            rules: [
                                { required: true, message: '密码不可为空' },
@@ -69,11 +73,16 @@ class Form extends React.Component {
                        clear
                    >密码</InputItem>
                    <Item
-                       extra={<Switch {...getFieldProps('remeberPassword', { initialValue: isRemeberPassword() || true, valuePropName: 'checked' })} />}
-                   >记住密码</Item>
+                       extra={
+                           <div>
+                               记住密码
+                            <Switch {...getFieldProps('remeberPassword', { initialValue: isRemeberPassword() || true, valuePropName: 'checked' })} />
+                           </div>
+                       }
+                   >&nbsp;</Item>
                    <Item>
-                       <div style={{textAlign:'center'}}>
-                        <Button type="primary" size="small" inline onClick={this.onSubmit}>登录</Button>
+                       <div style={{textAlign:'center',height:80,marginTop:40}}>
+                            <Button type="primary" size={"large"}  onClick={this.onSubmit}>登录</Button>
                        </div>
                    </Item>
                </List>
