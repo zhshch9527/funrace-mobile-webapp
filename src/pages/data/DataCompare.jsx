@@ -117,9 +117,9 @@ class DataCompare extends React.Component {
             }
 
             return (
-                <BaseRender componentDidMount={drawChart} componentDidUpdate={drawChart}>
+                <BaseRender componentDidMount={drawChart} componentDidUpdate={drawChart}  divProps={{style:{backgroundColor:'white'}}}>
                     <canvas id={id} width={document.body.clientWidth} height="260"></canvas>
-                    <div style={{textAlign:'center',fontWeight:'bold'}}>{title}</div>
+                    <div style={{textAlign:'center',fontWeight:'bold',padding:10}}>{title}</div>
                 </BaseRender>
             )
         }

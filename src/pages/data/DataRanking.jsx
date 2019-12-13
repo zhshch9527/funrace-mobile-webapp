@@ -132,9 +132,9 @@ class DataRanking extends React.Component {
             }
 
             return (
-                <BaseRender componentDidMount={drawChart} componentDidUpdate={drawChart}>
+                <BaseRender componentDidMount={drawChart} componentDidUpdate={drawChart}  divProps={{style:{backgroundColor:'white'}}}>
                     <canvas id={id} width={document.body.clientWidth} height="260"></canvas>
-                    <div style={{textAlign:'center',fontWeight:'bold'}}>{title}</div>
+                    <div style={{textAlign:'center',fontWeight:'bold',padding:10}}>{title}</div>
                 </BaseRender>
             )
         }
@@ -172,20 +172,23 @@ class DataRanking extends React.Component {
             }
             return (
                 <div>
-                    <Grid data={gridData} itemStyle={{height:50}}
-                          columnNum={3}
-                          renderItem={(dataItem, itemIndex) => {
-                              if(itemIndex === 0 || itemIndex === 1 || itemIndex === 2){
-                                  return (
-                                      <div style={{fontWeight:'bold',padding:10}}>{dataItem.value}</div>
-                                  )
-                              }else{
-                                  return (
-                                      <div style={{padding:10}}>{dataItem.value}</div>
-                                  )
-                              }
-                          }}
-                    />
+                    <div style={{marginTop:10}}>
+                        <Grid data={gridData} itemStyle={{height:50}}
+                              columnNum={3}
+                              renderItem={(dataItem, itemIndex) => {
+                                  if(itemIndex === 0 || itemIndex === 1 || itemIndex === 2){
+                                      return (
+                                          <div style={{fontWeight:'bold',padding:10}}>{dataItem.value}</div>
+                                      )
+                                  }else{
+                                      return (
+                                          <div style={{padding:10}}>{dataItem.value}</div>
+                                      )
+                                  }
+                              }}
+                        />
+                    </div>
+
                     <div style={{marginTop:20}}>
                         {initCountChart(countChartOptions)}
                     </div>
