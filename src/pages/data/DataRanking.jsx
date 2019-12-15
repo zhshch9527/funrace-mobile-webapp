@@ -3,7 +3,7 @@ import {Grid,SegmentedControl} from 'antd-mobile';
 import {formShape } from 'rc-form';
 import F2 from '@antv/f2';
 import BaseRender from "../../components/base/BaseRender";
-import {isNotEmpty, number_format} from "../../utils/common";
+import {getUuid, isNotEmpty, number_format} from "../../utils/common";
 import {call} from "../../utils/service";
 
 const TypeObj = {
@@ -80,7 +80,7 @@ class DataRanking extends React.Component {
 
             let canvasWidth = data.length <= 10 ? document.body.clientWidth : data.length * 70 ;
             return (
-                <BaseRender componentDidMount={drawChart} componentDidUpdate={drawChart}  divProps={{style:{backgroundColor:'white',}}}>
+                <BaseRender  key={id+getUuid()} componentDidMount={drawChart} componentDidUpdate={drawChart}  divProps={{style:{backgroundColor:'white',}}}>
                     <div style={{overflowX:'scroll'}}>
                         <canvas id={id} key={id} style={{width:canvasWidth,height:300}} ></canvas>
                     </div>
