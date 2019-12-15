@@ -110,6 +110,24 @@ export function deepClone(obj) {
   return o;
 }
 
+/**
+ * js生成uuid
+ * @returns
+ */
+export function getUuid() {
+    let s = [];
+    let hexDigits = "0123456789abcdef";
+    for (let i = 0; i < 36; i++) {
+        s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
+    }
+    s[14] = "4";  // bits 12-15 of the time_hi_and_version field to 0010
+    s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1);  // bits 6-7 of the clock_seq_hi_and_reserved to 01
+    s[8] = s[13] = s[18] = s[23] = "-";
+
+    let uuid = s.join("");
+    return uuid;
+}
+
 export function getFunctionValue(key,...params){
     if(Type.isFunction(key)){
         key = key(...params) ;
@@ -141,3 +159,34 @@ Date.prototype.format = function(format) {
     }
     return format;
 };
+
+/** 千分位加 分隔符
+ * num：要格式化的数字
+ * */
+export function number_format(num) {
+    //将输入的数字转换为字符串
+    num = num.toString();
+    //判断是否有百分号,百分比不加千分位分隔符
+    if(num.endsWith('%')){
+        return num;
+    }
+    //判断输入内容是否为整数或小数
+    if(Type.isNumber(Number(num))){
+        if(!num.includes(".")){
+            num += '.00' ;
+        }
+        num = num.replace(/\./,',');
+        /***
+         *判断是否有4个相连的数字，如果有则需要继续拆分，否则结束循环；
+         *将4个相连以上的数字分成两组，第一组$1是前面所有的数字（负数则有符号），
+         *第二组第一个逗号及其前面3个相连的数字；
+         * 将第二组内容替换为“,3个相连的数字，”
+         ***/
+        while(/\d{4}/.test(num)){ //
+            num = num.replace(/(\d+)(\d{3}\,)/,'$1,$2');
+        }
+        //将最后一个逗号换成小数点
+        num = num.replace(/\,(\d*)$/,'.$1');
+    }
+    return num;
+}

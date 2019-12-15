@@ -3,7 +3,7 @@ import {Type} from './common';
 import qs from 'qs' ;
 import {getUrl} from './urlTools';
 import {Toast} from 'antd-mobile' ;
-import {removeToken} from "./authority";
+import {getTokenHeader, removeToken} from "./authority";
 
 export default async function request(url, options = {}) {
   const GET = 'GET';
@@ -11,6 +11,7 @@ export default async function request(url, options = {}) {
     credentials: 'include',
     headers: {
       ...options.headers,
+      ...getTokenHeader(),
     }
   };
 

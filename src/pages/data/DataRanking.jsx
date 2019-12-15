@@ -3,11 +3,12 @@ import {Grid,SegmentedControl} from 'antd-mobile';
 import {formShape } from 'rc-form';
 import F2 from '@antv/f2/lib/index-all';
 import BaseRender from "../../components/base/BaseRender";
-import {isNotEmpty} from "../../utils/common";
+import {isNotEmpty, number_format} from "../../utils/common";
+import {call} from "../../utils/service";
 
 const TypeObj = {
-    0:{code:'shop',title:'店仓'},
-    1:{code:'employee',title:'店员'},
+    0:{code:'shop',title:'店仓',url:'/api/leaderSale/findSalesByShop'},
+    1:{code:'employee',title:'店员',url:'/api/leaderSale/findSalesByEmployee'},
 }
 
 const TypeObjHelper = {
@@ -19,6 +20,9 @@ const TypeObjHelper = {
     },
     getTitleByIndex:(index)=>{
         return TypeObj[index].title ;
+    },
+    getUrlByIndex:(index)=>{
+        return TypeObj[index].url ;
     }
 }
 
@@ -37,43 +41,27 @@ class DataRanking extends React.Component {
     }
 
     searchData = (selectedSegmentIndex = 0)=>{
-        let title = TypeObjHelper.getTitleByIndex(selectedSegmentIndex) ;
-        let code = TypeObjHelper.getCodeByIndex(selectedSegmentIndex) ;
-        //日期
-        // let {date} = this.props ;
-        // call({
-        //  url:'',
-        //  data:{code,date},
-        // },{
-        //     success:(data)=>{
-        //
-        //     }
-        // })
-        let data = [
-            {name:title+1,count:94,money:66800.00,},
-            {name:title+2,count:24,money:16792.00,},
-            {name:title+3,count:74,money:45415.00,},
-            {name:title+4,count:33,money:345.00,},
-            {name:title+5,count:44,money:7688.00,},
-            {name:title+6,count:68,money:567.00,},
-            {name:title+7,count:23,money:4358.00,},
-            {name:title+8,count:11,money:212.00,},
-            {name:title+9,count:5,money:1235.00,},
-            {name:title+10,count:89,money:546.00,},
-            {name:title+11,count:2,money:457.00,},
-            {name:title+12,count:330,money:231.00,},
-            {name:title+13,count:78,money:5678.00,},
-            {name:title+14,count:34,money:8879.00,},
-            {name:title+15,count:22,money:5678.00,},
-            {name:title+16,count:11,money:2134.00,},
-            {name:title+17,count:18,money:5434.00,},
-            {name:title+18,count:32,money:12356.00,},
-            {name:title+19,count:78,money:6688.00,},
-            {name:title+20,count:66,money:3489.00,},
-        ] ;
-
-
-        this.setState({data}) ;
+        let {date,isSelectMonth} = this.props ;
+        let url=TypeObjHelper.getUrlByIndex(selectedSegmentIndex);
+        //去后台查询
+        call({
+            url,
+            data:{'bizDate':date.format('yyyy-MM-dd'), isSelectMonth},
+        },{
+            success:(data)=>{
+                let dataList=[];
+                if (data.length>0) {
+                    data.map(items => {
+                        dataList.push({
+                            name:items.name,
+                            count:items.salesCount,
+                            money:items.salesAmount,
+                        })
+                    })
+                }
+                this.setState({data:dataList}) ;
+            }
+        })
     }
 
     initRender=()=>{
@@ -169,7 +157,7 @@ class DataRanking extends React.Component {
             let headerGridData = [{value:title},{value:'数量'},{value:'金额'},] ;
             let gridData = data.flatMap(d=>{
                 let {name,count,money} = d ;
-                return [{value:name},{value:count},{value:money}] ;
+                return [{value:name},{value:count},{value:number_format(money)}] ;
             })
 
 
@@ -188,8 +176,10 @@ class DataRanking extends React.Component {
                     overflow:'auto',
                 }
             }
+            let {date,isSelectMonth} = this.props ;
             return (
                 <div>
+                    <div style={{textAlign:'left',fontWeight:'bold',margin:5}}>{date.format( isSelectMonth ? 'yyyy-MM' : 'yyyy-MM-dd')}</div>
                     <div style={{marginTop:10}}>
                         <Grid data={headerGridData} itemStyle={{height:50,lineHeight:4}}
                               columnNum={3}

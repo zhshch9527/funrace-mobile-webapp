@@ -1,8 +1,14 @@
 const tokenKey = 'token';
 
-function getToken() {
+export function getToken() {
     let token = sessionStorage.getItem(tokenKey) || localStorage.getItem(tokenKey);
     return JSON.parse(token);
+}
+
+export function getTokenHeader() {
+    return {
+        Authorization: getToken(),
+    }
 }
 
 export function setToken(tokenObj, remeberPassword = true) {

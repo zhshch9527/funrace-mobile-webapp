@@ -3,11 +3,12 @@ import {Grid,SegmentedControl} from 'antd-mobile';
 import {formShape } from 'rc-form';
 import F2 from '@antv/f2/lib/index-all';
 import BaseRender from "../../components/base/BaseRender";
-import {isNotEmpty} from "../../utils/common";
+import {isNotEmpty, number_format} from "../../utils/common";
+import {call} from "../../utils/service";
 
 const TypeObj = {
-    0:{code:'day',title:'当日对比'},
-    1:{code:'month',title:'当月对比'},
+    0:{code:'day',title:'当日对比',url:'/api/leaderSale/findLastYearSalesStatic'},
+    1:{code:'month',title:'当月对比',url:'/api/leaderSale/findLastYearSalesStatic'},
 }
 
 const TypeObjHelper = {
@@ -19,6 +20,9 @@ const TypeObjHelper = {
     },
     getTitleByIndex:(index)=>{
         return TypeObj[index].title ;
+    },
+    getUrlByIndex:(index)=>{
+        return TypeObj[index].url ;
     }
 }
 
@@ -36,21 +40,23 @@ class DataCompare extends React.Component {
         this.searchData() ;
     }
 
-    searchData = (selectedSegmentIndex=0)=>{
-        let title = TypeObjHelper.getTitleByIndex(selectedSegmentIndex)
-        let code = TypeObjHelper.getCodeByIndex(selectedSegmentIndex)
-        //日期
-        // let {date} = this.props ;
-        // call({
-        //  url:'',
-        //  data:{code,date},
-        // },{
-        //     success:(data)=>{
-        //
-        //     }
-        // })
-        let dataObj = {count:94,count2:35,money:66800.00,money2:5588.00} ;
-        this.setState({dataObj}) ;
+    searchData = ()=>{
+        let {date,isSelectMonth} = this.props ;
+        call({
+            url:'/api/leaderSale/findLastYearSalesStatic',
+            data:{'bizDate':date.format('yyyy-MM-dd'),isSelectMonth},
+        },{
+            success:(data)=>{
+                let dataObj = {
+                    count:data.count,
+                    count2:data.count2,
+                    amount:data.amount,
+                    amount2:data.amount2} ;
+                this.setState({dataObj}) ;
+            }
+        })
+
+
     }
 
     initRender=()=>{
@@ -136,28 +142,36 @@ class DataCompare extends React.Component {
 
         const initMoneyChart = (options={})=>{
             let {data,type} = options ;
-            return initChart({key:type+'-money',data,title:'金额统计'})
+            return initChart({key:type+'-amount',data,title:'金额统计'})
         }
 
         const initSegmentedControlContent=()=>{
+            let {date,isSelectMonth} = this.props ;
+            let date1=date.format(isSelectMonth ? 'yyyy-MM' : 'yyyy-MM-dd');
+            let date2=(date1.substr(0,4)-1)+date1.substring(4);
             let {dataObj,selectedSegmentIndex} = this.state ;
             let code = TypeObjHelper.getCodeByIndex(selectedSegmentIndex)
 
-            let gridData = [{number:dataObj.count,text:'数量',color:'blue'},{number:dataObj.count2,text:'去年同期数量',color:'red'},
-                {number:dataObj.money,text:'金额',color:'blue'},{number:dataObj.money2,text:'去年同期金额',color:'red'},]
+            let gridData = [
+                {number:dataObj.count,text:date1+'数量',color:'blue'},
+                {number:number_format(dataObj.amount),text:date1+'金额',color:'red'},
+                {number:dataObj.count2,text:date2+'数量',color:'blue'},
+                {number:number_format(dataObj.amount2),text:date2+'金额',color:'red'},
+                {number:'对比:'+(dataObj.count-dataObj.count2),text:'',color:'green'},
+                {number:'对比:'+number_format(dataObj.amount-dataObj.amount2),text:'',color:'green'},]
 
             let countChartOptions = {
-                data:[{name:'数量',count:dataObj.count},{name:'去年同期数量',count:dataObj.count2}],
+                data:[{name:date1+'数量',count:dataObj.count},{name:date2+'数量',count:dataObj.count2}],
                 type:code,
             }
-            let moneyChartOptions = {
-                data:[{name:'数量',count:dataObj.money},{name:'去年同期数量',count:dataObj.money2}],
+            let amountChartOptions = {
+                data:[{name:date1+'金额',count:dataObj.amount},{name:date2+'金额',count:dataObj.amount2}],
                 type:code,
             }
-            let {date} = this.props ;
+
             return (
                 <div>
-                    <div style={{textAlign:'center',fontWeight:'bold',margin:5}}>{date.format(selectedSegmentIndex === 0 ? 'yyyy-MM-dd' : 'yyyy-MM')}</div>
+                    <div style={{textAlign:'left',fontWeight:'bold',margin:5}}>{date1+'与'+date2+'同期对比'}</div>
                     <Grid data={gridData} itemStyle={{height:50,marginLeft:1,marginTop:1}}
                           columnNum={2}
                           renderItem={dataItem => (
@@ -173,7 +187,7 @@ class DataCompare extends React.Component {
                         {initCountChart(countChartOptions)}
                     </div>
                     <div style={{marginTop:20,marginBottom:20}}>
-                        {initMoneyChart(moneyChartOptions)}
+                        {initMoneyChart(amountChartOptions)}
                     </div>
                 </div>
             )
@@ -189,8 +203,8 @@ class DataCompare extends React.Component {
         return (
             <div >
                 <div>
-                    <SegmentedControl  style={{ height: 30,width:'70%' }} onChange={onSegmentedControlChange} selectedIndex={selectedSegmentIndex}
-                                       values={TypeObjHelper.getTitles()}/>
+                    {/*<SegmentedControl  style={{ height: 30,width:'70%' }} onChange={onSegmentedControlChange} selectedIndex={selectedSegmentIndex}*/}
+                                       {/*values={TypeObjHelper.getTitles()}/>*/}
                     {initSegmentedControlContent()}
                 </div>
             </div>

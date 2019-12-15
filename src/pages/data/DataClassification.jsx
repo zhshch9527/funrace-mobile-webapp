@@ -3,13 +3,14 @@ import {Grid,SegmentedControl,WhiteSpace} from 'antd-mobile';
 import {formShape } from 'rc-form';
 import F2 from '@antv/f2/lib/index-all';
 import BaseRender from "../../components/base/BaseRender";
-import {isNotEmpty} from "../../utils/common";
+import {isNotEmpty, number_format} from "../../utils/common";
+import {call} from "../../utils/service";
 
 const TypeObj = {
-    0:{code:'band',title:'品牌'},
-    1:{code:'category',title:'类别'},
-    2:{code:'year',title:'年份'},
-    3:{code:'season',title:'季节'}
+    0:{code:'band',title:'品牌',url:'/api/leaderSale/findSalesByBrand'},
+    1:{code:'category',title:'类别',url:'/api/leaderSale/findSalesByCategory'},
+    2:{code:'year',title:'年份',url:'/api/leaderSale/findSalesByYear'},
+    3:{code:'season',title:'季节',url:'/api/leaderSale/findSalesBySeason'}
 }
 
 const TypeObjHelper = {
@@ -21,7 +22,11 @@ const TypeObjHelper = {
     },
     getTitleByIndex:(index)=>{
         return TypeObj[index].title ;
+    },
+    getUrlByIndex:(index)=>{
+        return TypeObj[index].url ;
     }
+
 }
 
 class DataClassification extends React.Component {
@@ -39,27 +44,27 @@ class DataClassification extends React.Component {
     }
 
     searchData = (selectedSegmentIndex=0)=>{
-        // let {date} = this.props ;
-        // let code = TypeObjHelper.getCodeByIndex(selectedSegmentIndex)
-        // //去后台查询
-        // call({
-        //     url:'',
-        //     data:{code,date},
-        // },{
-        //     success:(data)=>{
-        //
-        //     }
-        // })
-
-        let title = TypeObjHelper.getTitleByIndex(selectedSegmentIndex)
-        let data = [
-            {name:title+1, count:10, money:230},
-            {name:title+2, count:20, money:2430},
-            {name:title+3, count:40, money:6730},
-            {name:title+4, count:80, money:560},
-            ] ;
-        //做假数据
-        this.setState({data}) ;
+        let {date,isSelectMonth} = this.props ;
+        let url=TypeObjHelper.getUrlByIndex(selectedSegmentIndex);
+        //去后台查询
+        call({
+            url,
+            data:{'bizDate':date.format('yyyy-MM-dd'), isSelectMonth},
+        },{
+            success:(data)=>{
+                let dataList=[];
+                if (data.length>0) {
+                    data.map(items => {
+                        dataList.push({
+                            name:items.name,
+                            count:items.salesCount,
+                            money:items.salesAmount,
+                        })
+                    })
+                }
+                this.setState({data:dataList}) ;
+            }
+        })
     }
 
     initRender=()=>{
@@ -158,7 +163,7 @@ class DataClassification extends React.Component {
             let headerGridData = [{value:title},{value:'数量'},{value:'金额'},] ;
             let gridData = data.flatMap(d=>{
                 let {name,count,money} = d ;
-                return [{value:name},{value:count},{value:money}] ;
+                return [{value:name},{value:count},{value:number_format(money)}] ;
             })
 
 
@@ -178,8 +183,10 @@ class DataClassification extends React.Component {
                     overflow:'auto',
                 }
             }
+            let {date,isSelectMonth} = this.props ;
             return (
                 <div>
+                    <div style={{textAlign:'left',fontWeight:'bold',margin:5}}>{date.format( isSelectMonth ? 'yyyy-MM' : 'yyyy-MM-dd')}</div>
                     <div style={{marginTop:10}}>
                         <Grid data={headerGridData} itemStyle={{height:50,lineHeight:4}}
                               columnNum={3}

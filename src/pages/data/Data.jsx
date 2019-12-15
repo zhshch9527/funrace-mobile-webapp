@@ -4,9 +4,7 @@ import { createForm, formShape } from 'rc-form';
 import DataRanking from './DataRanking' ;
 import DataClassification from './DataClassification' ;
 import DataCompare from './DataCompare' ;
-import {call} from "../../utils/service";
 const {Item} = List ;
-
 
 
 class Data extends React.Component {
@@ -16,14 +14,22 @@ class Data extends React.Component {
 
     state = {
         date: new Date(),
+        isMonth:false,
         selectedSegmentIndex:0,
         totalData:[],
     }
     componentDidMount(){
-        this.searchTotalData(this.state.date) ;
+        let {date,isMonth=false} = this.state ;
+        this.searchTotalData({date,isMonth}) ;
     }
 
-    searchTotalData=(date)=>{
+    gridDayOrMonthClick=(isMonth)=>{
+        this.setState({isMonth}) ;
+        let {date} = this.state ;
+        this.searchTotalData({date,isMonth}) ;
+    }
+
+    searchTotalData=({date,isMonth})=>{
         //查询总的信息
         call({
             url:'/api/leaderSale/findSalesStatic',
@@ -45,7 +51,8 @@ class Data extends React.Component {
 
     dateOnchange = (date)=>{
         this.setState({date}) ;
-        this.searchTotalData(date) ;
+        let {isMonth=false} = this.state;
+        this.searchTotalData({date,isMonth}) ;
     }
 
     //分类
@@ -107,14 +114,17 @@ class Data extends React.Component {
 
                 <Grid data={totalData} itemStyle={{height:50,marginLeft:1,marginTop:1}}
                       columnNum={2}
-                      renderItem={dataItem => (
-                          <div>
-                              <div style={{ backgroundColor:'#FFCC66' ,fontSize: 14 , fontWeight:'bold',padding:10}}>
-                                  <div style={{color:dataItem.color}}>{dataItem.number}</div>
-                                  <div>{dataItem.text}</div>
+                      renderItem={dataItem => {
+                          let {divProps={}} = dataItem ;
+                          return (
+                              <div>
+                                  <div style={{ backgroundColor:'#FFCC66' ,fontSize: 14 , fontWeight:'bold',padding:10}} {...divProps}>
+                                      <div style={{color:dataItem.color}}>{dataItem.number}</div>
+                                      <div>{dataItem.text}</div>
+                                  </div>
                               </div>
-                          </div>
-                      )}
+                          )
+                      }}
                 />
 
                 <WhiteSpace/>
