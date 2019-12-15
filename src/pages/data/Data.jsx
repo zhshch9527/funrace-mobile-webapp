@@ -62,7 +62,7 @@ class Data extends React.Component {
     }
 
     dateOnchange = (date)=>{
-        this.setState({date}) ;
+        this.setState({date,id1:getUuid(),id2:getUuid(),id3:getUuid()}) ;
         let {isSelectMonth=false} = this.state;
         this.searchTotalData({date,isSelectMonth}) ;
     }
