@@ -78,7 +78,7 @@ class DataRanking extends React.Component {
                 chart.render();
             }
 
-            let canvasWidth = data.length <= 10 ? document.body.clientWidth : data.length * 50 ;
+            let canvasWidth = data.length <= 10 ? document.body.clientWidth : data.length * 70 ;
             return (
                 <BaseRender componentDidMount={drawChart} componentDidUpdate={drawChart}  divProps={{style:{backgroundColor:'white',}}}>
                     <div style={{overflowX:'scroll'}}>
