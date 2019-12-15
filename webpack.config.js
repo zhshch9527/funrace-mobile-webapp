@@ -3,6 +3,7 @@ const webpack = require('webpack')
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const autoprefixer = require('autoprefixer');
 const pxtorem = require('postcss-pxtorem');
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 const Visualizer = require('webpack-visualizer-plugin'); // remove it in production environment.
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin; // remove it in production environment.
@@ -45,8 +46,7 @@ module.exports = {
   output: {
     filename: '[name].js',
     chunkFilename: '[id].chunk.js',
-    path: path.join(__dirname, '/dist'),
-    publicPath: '/dist/'
+    path: path.resolve(__dirname,'dist'),
   },
 
   resolve: {
@@ -95,6 +95,10 @@ module.exports = {
     "react-dom": "ReactDOM"
   },
   plugins: [
+      new HtmlWebpackPlugin({
+          template:'index.html',
+          filename:'index.html'
+      }),
     new webpack.optimize.ModuleConcatenationPlugin(),
     // new webpack.optimize.CommonsChunkPlugin('shared.js'),
     new webpack.optimize.CommonsChunkPlugin({
