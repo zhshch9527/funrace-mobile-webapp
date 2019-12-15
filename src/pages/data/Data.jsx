@@ -4,7 +4,9 @@ import { createForm, formShape } from 'rc-form';
 import DataRanking from './DataRanking' ;
 import DataClassification from './DataClassification' ;
 import DataCompare from './DataCompare' ;
+import {call} from "../../utils/service";
 const {Item} = List ;
+
 
 
 class Data extends React.Component {
@@ -23,18 +25,22 @@ class Data extends React.Component {
 
     searchTotalData=(date)=>{
         //查询总的信息
-        // call({
-        //     url:'',
-        //     data:{},
-        // },{
-        //     success:(data)=>{
-        //
-        //     }
-        // })
-        const totalData = [{number:192,text:'当日数量',color:'blue'},{number:129007.00,text:'当日金额',color:'red'},
-            {number:3152,text:'当月数量',color:'blue'},{number:2210302.00,text:'当月金额',color:'red'}]
+        call({
+            url:'/api/leaderSale/findSalesStatic',
+            data:{'bizDate':date.format('yyyy-MM-dd')},
+        },{
+            success:(data)=>{
+                console.log(data);
+                const totalData = [
+                    {number:data.dayCount,text:'当日数量',color:'blue'},
+                    {number:data.dayAmount,text:'当日金额',color:'red'},
+                    {number:data.monthCount,text:'当月数量',color:'blue'},
+                    {number:data.monthAmount,text:'当月金额',color:'red'}]
 
-        this.setState({totalData}) ;
+                this.setState({totalData}) ;
+            }
+        })
+
     }
 
     dateOnchange = (date)=>{
