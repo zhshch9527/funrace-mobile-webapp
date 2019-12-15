@@ -83,7 +83,7 @@ class DataClassification extends React.Component {
             return (
                 <BaseRender componentDidMount={drawChart} componentDidUpdate={drawChart} divProps={{style:{backgroundColor:'white'}}}>
                     <div style={{overflowX:'auto'}}>
-                        <canvas id={id} style={{width:canvasWidth,height:300}} ></canvas>
+                        <canvas id={id} key={id} style={{width:canvasWidth,height:300}} ></canvas>
                     </div>
                     <div style={{textAlign:'center',fontWeight:'bold',padding:10}}>{title}</div>
                 </BaseRender>
