@@ -4,6 +4,8 @@ import { createForm, formShape } from 'rc-form';
 import DataRanking from './DataRanking' ;
 import DataClassification from './DataClassification' ;
 import DataCompare from './DataCompare' ;
+import {call} from "../../utils/service";
+import {getUuid, number_format} from "../../utils/common";
 const {Item} = List ;
 
 
@@ -14,34 +16,44 @@ class Data extends React.Component {
 
     state = {
         date: new Date(),
-        isMonth:false,
+        isSelectMonth:true,
         selectedSegmentIndex:0,
         totalData:[],
+        id1:getUuid(),
+        id2:getUuid(),
+        id3:getUuid(),
     }
     componentDidMount(){
-        let {date,isMonth=false} = this.state ;
-        this.searchTotalData({date,isMonth}) ;
+        let {date,isSelectMonth=false} = this.state ;
+        this.searchTotalData({date,isSelectMonth}) ;
     }
 
-    gridDayOrMonthClick=(isMonth)=>{
-        this.setState({isMonth}) ;
+    gridDayOrMonthClick=(isSelectMonth)=>{
+        this.setState({isSelectMonth,id1:getUuid(),id2:getUuid(),id3:getUuid()})
         let {date} = this.state ;
-        this.searchTotalData({date,isMonth}) ;
+        this.searchTotalData({date,isSelectMonth}) ;
     }
 
-    searchTotalData=({date,isMonth})=>{
+    searchTotalData=({date})=>{
         //查询总的信息
         call({
             url:'/api/leaderSale/findSalesStatic',
             data:{'bizDate':date.format('yyyy-MM-dd')},
         },{
             success:(data)=>{
-                console.log(data);
                 const totalData = [
                     {number:data.dayCount,text:'当日数量',color:'blue'},
-                    {number:data.dayAmount,text:'当日金额',color:'red'},
+                    {number:number_format(data.dayAmount),text:'当日金额',color:'red',divProps:{
+                            onClick:()=>{
+                                this.gridDayOrMonthClick(false) ;
+                            }
+                        }},
                     {number:data.monthCount,text:'当月数量',color:'blue'},
-                    {number:data.monthAmount,text:'当月金额',color:'red'}]
+                    {number:number_format(data.monthAmount),text:'当月金额',color:'red',divProps:{
+                            onClick:()=>{
+                                this.gridDayOrMonthClick(true) ;
+                            }
+                        }}]
 
                 this.setState({totalData}) ;
             }
@@ -51,33 +63,33 @@ class Data extends React.Component {
 
     dateOnchange = (date)=>{
         this.setState({date}) ;
-        let {isMonth=false} = this.state;
-        this.searchTotalData({date,isMonth}) ;
+        let {isSelectMonth=false} = this.state;
+        this.searchTotalData({date,isSelectMonth}) ;
     }
 
     //分类
     initClassification=()=>{
-        let {date} = this.state ;
+        let {date,isSelectMonth,id1} = this.state ;
         return (
             <div>
-                <DataClassification date={date}/>
+                <DataClassification date={date} isSelectMonth={isSelectMonth}  key={id1}/>
             </div>
         )
     }
 
     initRanking=()=>{
-        let {date} = this.state ;
+        let {date,isSelectMonth,id2} = this.state ;
         return (
-            <DataRanking date={date}/>
+            <DataRanking date={date} isSelectMonth={isSelectMonth} key={id2}/>
         )
     }
 
     //对比
     initCompare=()=>{
-        let {date} = this.state ;
+        let {date,isSelectMonth,id3} = this.state ;
         return (
             <div>
-               <DataCompare date={date}/>
+               <DataCompare date={date} isSelectMonth={isSelectMonth} key={id3} />
             </div>
         )
     }
