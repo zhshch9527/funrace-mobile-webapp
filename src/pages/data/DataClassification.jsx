@@ -1,7 +1,7 @@
 import React from 'react';
-import {Grid,SegmentedControl,WhiteSpace} from 'antd-mobile';
+import {Grid,SegmentedControl} from 'antd-mobile';
 import {formShape } from 'rc-form';
-import F2 from '@antv/f2/lib/index-all';
+import F2 from '@antv/f2';
 import BaseRender from "../../components/base/BaseRender";
 import {isNotEmpty, number_format} from "../../utils/common";
 import {call} from "../../utils/service";
@@ -70,67 +70,16 @@ class DataClassification extends React.Component {
     initRender=()=>{
         const initChart = ({data,title,key,id='myChart-'+key})=>{
             const drawChart=()=>{
-                console.info(id)
-                console.info(data)
-                console.info(title)
                 const chart = new F2.Chart({
                     id,
                     pixelRatio: window.devicePixelRatio
                 });
 
                 chart.source(data);
-                chart.tooltip(false);
-                chart.interval().position('name*count').color("name") ;
-                chart.render();
+                chart.legend(false) ;
+                chart.interval().position('name*count').color('name')
+                chart.render() ;
 
-                // 绘制柱状图文本
-                const offset = -5;
-                const canvas = chart.get('canvas');
-                const group = canvas.addGroup();
-                const shapes = {};
-                data.forEach(function(obj) {
-                    const point = chart.getPosition(obj);
-                    const text = group.addShape('text', {
-                        attrs: {
-                            x: point.x,
-                            y: point.y + offset,
-                            text: obj.count,
-                            textAlign: 'center',
-                            textBaseline: 'bottom',
-                            fill: '#808080'
-                        }
-                    });
-
-                    shapes[obj.name] = text; // 缓存该 shape, 便于后续查找
-                });
-
-                let lastTextShape; // 上一个被选中的 text
-                // 配置柱状图点击交互
-                chart.interaction('interval-select', {
-                    selectAxisStyle: {
-                        fill: '#000',
-                        fontWeight: 'bold'
-                    },
-                    mode: 'range',
-                    onEnd: function onEnd(ev) {
-                        const data = ev.data,
-                            selected = ev.selected;
-
-                        lastTextShape && lastTextShape.attr({
-                            fill: '#808080',
-                            fontWeight: 'normal'
-                        });
-                        if (selected) {
-                            const textShape = shapes[data.name];
-                            textShape.attr({
-                                fill: '#000',
-                                fontWeight: 'bold'
-                            });
-                            lastTextShape = textShape;
-                        }
-                        canvas.draw();
-                    }
-                });
             }
 
             let canvasWidth = data.length <= 10 ? document.body.clientWidth : data.length * 50 ;
@@ -138,7 +87,6 @@ class DataClassification extends React.Component {
                 <BaseRender componentDidMount={drawChart} componentDidUpdate={drawChart} divProps={{style:{backgroundColor:'white'}}}>
                     <div style={{overflowX:'auto'}}>
                         <canvas id={id} style={{width:canvasWidth,height:300}} ></canvas>
-                        <div style={{width:canvasWidth}}>&nbsp;</div>
                     </div>
                     <div style={{textAlign:'center',fontWeight:'bold',padding:10}}>{title}</div>
                 </BaseRender>
