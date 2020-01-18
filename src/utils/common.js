@@ -172,6 +172,7 @@ export function number_format(num) {
     }
     //判断输入内容是否为整数或小数
     if(Type.isNumber(Number(num))){
+        num=parseFloat(num).toFixed(2);
         if(!num.includes(".")){
             num += '.00' ;
         }
